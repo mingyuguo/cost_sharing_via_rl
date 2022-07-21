@@ -47,18 +47,16 @@ def get_args():
 
 
 def test_ddpg(args=get_args()):
-    env = CostSharingEnv(5)
+    env = CostSharingEnv()
     args.state_shape = env.observation_space.shape or env.observation_space.n
     args.action_shape = env.action_space.shape or env.action_space.n
     args.max_action = env.action_space.high[0]
 
     # you can also use tianshou.env.SubprocVectorEnv
     train_envs = DummyVectorEnv(
-        [lambda: CostSharingEnv(5) for _ in range(args.training_num)]
+        [lambda: CostSharingEnv() for _ in range(args.training_num)]
     )
-    test_envs = DummyVectorEnv(
-        [lambda: CostSharingEnv(5) for _ in range(args.test_num)]
-    )
+    test_envs = DummyVectorEnv([lambda: CostSharingEnv() for _ in range(args.test_num)])
     # seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -125,10 +123,10 @@ def test_ddpg(args=get_args()):
     if __name__ == "__main__":
         pprint.pprint(result)
         # Let's watch its performance!
-        env = CostSharingEnv(5)
+        env = CostSharingEnv()
         policy.eval()
         collector = Collector(policy, env)
-        result = collector.collect(n_episode=1, render=args.render)
+        result = collector.collect(n_episode=1000, render=args.render)
         rews, lens = result["rews"], result["lens"]
         print(f"Final reward: {rews.mean()}, length: {lens.mean()}")
 
