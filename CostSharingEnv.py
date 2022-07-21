@@ -4,7 +4,7 @@ from gym import spaces
 from random import random
 
 # total number of agents
-n = 5
+n = 10
 
 
 def draw_type_profile():
