@@ -51,8 +51,8 @@ def test_ddpg(args=get_args()):
     args.action_shape = env.action_space.shape or env.action_space.n
     args.max_action = env.action_space.high[0]
 
-    train_envs = SubprocVectorEnv([lambda: CostSharingEnv() for _ in 20])
-    test_envs = SubprocVectorEnv([lambda: CostSharingEnv() for _ in 20])
+    train_envs = SubprocVectorEnv([lambda: CostSharingEnv() for _ in range(20)])
+    test_envs = SubprocVectorEnv([lambda: CostSharingEnv() for _ in range(20)])
     # seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
