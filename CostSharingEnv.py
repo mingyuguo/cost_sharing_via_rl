@@ -3,8 +3,11 @@ import numpy as np
 from gym import spaces
 from random import random
 
+# total number of agents
+n = 5
 
-def draw_type_profile(n):
+
+def draw_type_profile():
     def fix(x):
         return max(0, min(1, x))
 
@@ -21,7 +24,7 @@ def draw_type_profile(n):
 
 
 class CostSharingEnv(gym.Env):
-    def __init__(self, n):
+    def __init__(self):
         # observation space has length 2n, each coordinate is from 0 to 1
         # for each agent, we track her already-accepted value and whether she is alive (1 means alive, 0 means out)
         self.observation_space = spaces.Box(0, 1, (2 * n,), dtype=np.float32)
@@ -30,13 +33,10 @@ class CostSharingEnv(gym.Env):
         # we track the next_agent_to_offer, action x means increase her offer by x
         self.action_space = spaces.Box(0, 1, (1,), dtype=np.float32)
 
-        # total number of agents
-        self.n = n
-
     def reset(self):
-        self.type_profile = draw_type_profile(self.n)
-        self.accepted = [0] * self.n
-        self.alive = [1] * self.n
+        self.type_profile = draw_type_profile()
+        self.accepted = [0] * n
+        self.alive = [1] * n
 
         # always go from left to right, circular, skipping agents who are already out
         self.next_agent_to_offer = 0
@@ -63,7 +63,7 @@ class CostSharingEnv(gym.Env):
             self.alive[a] = 0
 
         self.next_agent_to_offer = None
-        for i in list(range(a + 1, self.n)) + list(range(a)):
+        for i in list(range(a + 1, n)) + list(range(a)):
             if self.alive[i]:
                 self.next_agent_to_offer = i
                 break
