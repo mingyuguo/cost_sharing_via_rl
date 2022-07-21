@@ -94,7 +94,7 @@ class CostSharingEnv(gym.Env):
 
 
 if __name__ == "__main__":
-    env = CostSharingEnv(5)
+    env = CostSharingEnv()
     env.reset()
     done = False
     while not done:
