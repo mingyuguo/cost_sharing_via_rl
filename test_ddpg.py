@@ -52,11 +52,12 @@ def test_ddpg(args=get_args()):
     args.action_shape = env.action_space.shape or env.action_space.n
     args.max_action = env.action_space.high[0]
 
-    # you can also use tianshou.env.SubprocVectorEnv
-    train_envs = DummyVectorEnv(
+    train_envs = SubprocVectorEnv(
         [lambda: CostSharingEnv() for _ in range(args.training_num)]
     )
-    test_envs = DummyVectorEnv([lambda: CostSharingEnv() for _ in range(args.test_num)])
+    test_envs = SubprocVectorEnv(
+        [lambda: CostSharingEnv() for _ in range(args.test_num)]
+    )
     # seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
