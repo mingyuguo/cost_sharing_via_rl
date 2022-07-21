@@ -1,0 +1,18 @@
+#!/bin/bash -l
+#SBATCH -p batch # partition (this is the queue your job will be added to)
+#SBATCH -N 1 # number of nodes (use a single node)
+#SBATCH -n 20 # number of cores (sequential job => uses 1 core)
+#SBATCH --time=1-00:00:00 # time allocation, which has the format (D-HH:MM:SS)
+#SBATCH --mem=4GB # specify the memory required per node (here set to 4 GB)
+#don't want gpu at all SBATCH --gres=gpu:1 # generic resource required (here requires 4 GPUs)
+
+#SBATCH --mail-type=END  # Send a notification email when the job is done (=END)
+#SBATCH --mail-type=FAIL # Send a notification email when the job fails (=FAIL)
+#SBATCH --mail-user=a1655062@adelaide.edu.au
+
+module load Anaconda3/2020.07
+conda activate testEnv
+python3 test_ddpg.py
+conda deactivate
+
+# maybe need conda install -c conda-forge -c powerai gym
