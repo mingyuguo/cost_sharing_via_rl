@@ -134,17 +134,24 @@ def test_ddpg(args=get_args(), policy_file=None):
 
 
 if __name__ == "__main__":
+    # train
     # test_ddpg()
+
+    # inspect training result
     policy = test_ddpg(policy_file="ddpg.pth")
 
     env = CostSharingEnv()
     env.reset()
     env.type_profile = [
         1
-    ] * 20  # I just want to see the first set of offers assuming everyone would accept
-    obs = [1] * 20
+    ] * 10  # I just want to see the first set of offers assuming everyone would accept
+    obs = np.asarray([0, 1] * 10, dtype=np.float32)
     done = False
     while not done:
-        action = float(policy.forward(Batch(obs=[obs])).act[0])
+        batch = Batch(obs=[obs], info={})
+        action = policy.forward(batch).act
+        action = policy.map_action(np.asarray([float(action[0])], dtype=np.float32))[0]
+        # tianshou's document is too vague, don't know whether the above is doing the correct thing
+        print(action)
         obs, reward, done, _ = env.step(action)
         print(obs, reward, done)

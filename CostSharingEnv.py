@@ -44,6 +44,7 @@ class CostSharingEnv(gym.Env):
         return self._obs_construct()
 
     def step(self, action):
+        assert 0 <= action <= 1
         # return format is: observation, reward, whether it is done, additional info dictionary
         a = self.next_agent_to_offer
         assert self.alive[a]
