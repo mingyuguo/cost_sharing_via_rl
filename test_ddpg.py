@@ -7,7 +7,7 @@ import torch
 from torch.utils.tensorboard import SummaryWriter
 
 from tianshou.data import Collector, VectorReplayBuffer
-from tianshou.env import DummyVectorEnv
+from tianshou.env import SubprocVectorEnv
 from tianshou.exploration import GaussianNoise
 from tianshou.policy import DDPGPolicy
 from tianshou.trainer import offpolicy_trainer
@@ -33,8 +33,7 @@ def get_args():
     parser.add_argument("--update-per-step", type=float, default=0.125)
     parser.add_argument("--batch-size", type=int, default=128)
     parser.add_argument("--hidden-sizes", type=int, nargs="*", default=[128, 128])
-    parser.add_argument("--training-num", type=int, default=8)
-    parser.add_argument("--test-num", type=int, default=100)
+    parser.add_argument("--test-num", type=int, default=1000)
     parser.add_argument("--logdir", type=str, default="log")
     parser.add_argument("--render", type=float, default=0.0)
     parser.add_argument("--rew-norm", action="store_true", default=False)
@@ -52,12 +51,8 @@ def test_ddpg(args=get_args()):
     args.action_shape = env.action_space.shape or env.action_space.n
     args.max_action = env.action_space.high[0]
 
-    train_envs = SubprocVectorEnv(
-        [lambda: CostSharingEnv() for _ in range(args.training_num)]
-    )
-    test_envs = SubprocVectorEnv(
-        [lambda: CostSharingEnv() for _ in range(args.test_num)]
-    )
+    train_envs = SubprocVectorEnv([lambda: CostSharingEnv() for _ in 20])
+    test_envs = SubprocVectorEnv([lambda: CostSharingEnv() for _ in 20])
     # seed
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
