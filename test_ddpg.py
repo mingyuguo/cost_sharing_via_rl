@@ -6,7 +6,7 @@ import numpy as np
 import torch
 from torch.utils.tensorboard import SummaryWriter
 
-from tianshou.data import Collector, VectorReplayBuffer
+from tianshou.data import Collector, VectorReplayBuffer, Batch
 from tianshou.env import SubprocVectorEnv
 from tianshou.exploration import GaussianNoise
 from tianshou.policy import DDPGPolicy
@@ -45,7 +45,7 @@ def get_args():
     return args
 
 
-def test_ddpg(args=get_args()):
+def test_ddpg(args=get_args(), policy_file=None):
     env = CostSharingEnv()
     args.state_shape = env.observation_space.shape or env.observation_space.n
     args.action_shape = env.action_space.shape or env.action_space.n
@@ -85,6 +85,12 @@ def test_ddpg(args=get_args()):
         estimation_step=args.n_step,
         action_space=env.action_space,
     )
+
+    if policy_file is not None:
+        policy.load_state_dict(torch.load(policy_file))
+        policy.eval()
+        return policy
+
     # collector
     train_collector = Collector(
         policy,
@@ -128,4 +134,17 @@ def test_ddpg(args=get_args()):
 
 
 if __name__ == "__main__":
-    test_ddpg()
+    # test_ddpg()
+    policy = test_ddpg(policy_file="ddpg.pth")
+
+    env = CostSharingEnv()
+    env.reset()
+    env.type_profile = [
+        1
+    ] * 20  # I just want to see the first set of offers assuming everyone would accept
+    obs = [1] * 20
+    done = False
+    while not done:
+        action = float(policy.forward(Batch(obs=[obs])).act[0])
+        obs, reward, done, _ = env.step(action)
+        print(obs, reward, done)
